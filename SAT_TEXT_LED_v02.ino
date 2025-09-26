@@ -43,7 +43,7 @@ bool Connected = false;
 
 
 #define RESPONSE_ID 0xC5  //ID while responding to init requests (which will use base_id)
-#define BASE_ID 0xC0      //ID when getting commands from HU                  ///SATNAV ID????; my comment
+#define BASE_ID 0xC0      //ID when getting commands from HU
 #define MASTER_ID 0xC7
 
 
@@ -766,7 +766,7 @@ In short:
 */
 
 
-//Notify HU that we want to trigger the first initiate procedure to add a new device (CD-CHGR//not really, i think its sirius sat)) by pulling BUSY line low for 1s
+//Notify HU that we want to trigger the first initiate procedure to add a new device (CD-CHGR) by pulling BUSY line low for 1s
 void melbusInitReq() {
   //Serial.println("conn");
   //Disable interrupt on INT_NUM quicker than: detachInterrupt(MELBUS_CLOCKBIT_INT);
@@ -936,22 +936,6 @@ void reqMaster() {
   DDRD &= ~(1 << MELBUS_DATA); //back to input_pullup
 }
 
-
-
-
-/*
----------------------------------- toggleOutput() ----------------------------------
-
-This helper function toggles (flips) the state of a given pin:
-
-1. Reads the current state of the pin (HIGH or LOW).
-2. Writes the opposite value back to the pin (LOW → HIGH, HIGH → LOW).
-3. Prints a debug message to Serial with the pin number.
-
-Used to turn LEDs or outputs on/off when buttons/commands are received.
-
-------------------------------------------------------------------------------------
-*/
 void toggleOutput(byte pinNumber) {
   digitalWrite(pinNumber, !digitalRead(pinNumber));
   Serial.print("toggled a pin: ");
@@ -959,6 +943,9 @@ void toggleOutput(byte pinNumber) {
 }
 
 //Simulate button presses on the BT module. 200 ms works good. Less is not more in this case...
+
+// More generic aproach to button handling
+/*
 void nextTrack() {
   digitalWrite(nextPin, HIGH);
   for (byte i = 0; i < 200; i++)
@@ -979,7 +966,27 @@ void play() {
     delayMicroseconds(1000);
   digitalWrite(playPin, LOW);
 }
+*/
+void simulateButton(const byte pin){
+  digitalWrite(pin, HIGH);
+  for (byte i = 0; i < 200; i++)
+    delayMicroseconds(1000);
+  digitalWrite(pin, LOW);
+}
+
+void nextTrack() {
+  simulateButton(nextPin);
+}
+
+void prevTrack() {
+  simulateButton(prevPin);
+}
+
+void play() {
+  simulateButton(playPin);
+}
+
+
 
 //Happy listening AND READING, hacker!
-
 
